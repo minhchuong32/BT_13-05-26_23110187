@@ -1,0 +1,98 @@
+[
+  {
+    "message": "Test server running / Root API",
+    "method": "GET",
+    "url": "http://localhost:8888/v1/api/",
+    "header": {},
+    "body": {}
+  },
+  {
+    "message": "Register a new user",
+    "method": "POST",
+    "url": "http://localhost:8888/v1/api/register",
+    "header": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "Test User",
+      "email": "test@example.com",
+      "password": "password123"
+    }
+  },
+  {
+    "message": "Login user",
+    "method": "POST",
+    "url": "http://localhost:8888/v1/api/login",
+    "header": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "email": "test@example.com",
+      "password": "password123"
+    }
+  },
+  {
+    "message": "Forgot password - Send OTP",
+    "method": "POST",
+    "url": "http://localhost:8888/v1/api/forgot-password",
+    "header": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "email": "test@example.com"
+    }
+  },
+  {
+    "message": "Reset password - Verify OTP and set new password",
+    "method": "POST",
+    "url": "http://localhost:8888/v1/api/reset-password",
+    "header": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "email": "test@example.com",
+      "otp": "123456",
+      "resetToken": "token_string_here",
+      "newPassword": "newpassword123"
+    }
+  },
+  {
+    "message": "Get all products with optional filters",
+    "method": "GET",
+    "url": "http://localhost:8888/v1/api/products?search=shoes&category=sneakers&minPrice=100000&maxPrice=500000&type=newest&sort=price_asc",
+    "header": {},
+    "body": {}
+  },
+  {
+    "message": "Get product by ID",
+    "method": "GET",
+    "url": "http://localhost:8888/v1/api/products/123",
+    "header": {},
+    "body": {}
+  },
+  {
+    "message": "Get all categories",
+    "method": "GET",
+    "url": "http://localhost:8888/v1/api/categories",
+    "header": {},
+    "body": {}
+  },
+  {
+    "message": "Get user details (Requires Auth)",
+    "method": "GET",
+    "url": "http://localhost:8888/v1/api/user",
+    "header": {
+      "Authorization": "Bearer your_access_token_here"
+    },
+    "body": {}
+  },
+  {
+    "message": "Get account details (Requires Auth)",
+    "method": "GET",
+    "url": "http://localhost:8888/v1/api/account",
+    "header": {
+      "Authorization": "Bearer your_access_token_here"
+    },
+    "body": {}
+  }
+]
