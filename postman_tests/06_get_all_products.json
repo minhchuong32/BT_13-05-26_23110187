@@ -1,0 +1,28 @@
+{
+  "message": "Get all products with optional filters",
+  "method": "GET",
+  "url": "http://localhost:8888/v1/api/products?search=shoes&category=sneakers&minPrice=100000&maxPrice=500000&type=newest&sort=price_asc",
+  "header": {},
+  "body": {},
+  "expected_result": {
+    "status": 200,
+    "body": {
+      "EC": 0,
+      "EM": "Get products successfully",
+      "DT": {
+        "totalRows": 1,
+        "totalPages": 1,
+        "products": [
+          {
+            "id": 1,
+            "name": "Nike Air Max",
+            "price": 2500000,
+            "description": "High quality shoes",
+            "image": "image_url.jpg",
+            "categoryId": 2
+          }
+        ]
+      }
+    }
+  }
+}

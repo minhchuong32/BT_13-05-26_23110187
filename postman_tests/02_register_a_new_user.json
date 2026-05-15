@@ -1,0 +1,22 @@
+{
+  "message": "Register a new user",
+  "method": "POST",
+  "url": "http://localhost:8888/v1/api/register",
+  "header": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password123"
+  },
+  "expected_result": {
+    "status": 201,
+    "body": {
+      "id": 5,
+      "name": "Test User",
+      "email": "test@example.com",
+      "role": "User"
+    }
+  }
+}

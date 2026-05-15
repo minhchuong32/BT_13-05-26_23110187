@@ -1,0 +1,23 @@
+{
+  "message": "Login user",
+  "method": "POST",
+  "url": "http://localhost:8888/v1/api/login",
+  "header": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "email": "test@example.com",
+    "password": "password123"
+  },
+  "expected_result": {
+    "status": 200,
+    "body": {
+      "EC": 0,
+      "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwiaWF0IjoxNzc4ODM4ODE4LCJleHAiOjE3Nzg5MjUyMTh9.XWt1ggzyZfZ-srBZQdaHM3l6pUmJ9fyHZwALttMQk4M",
+      "user": {
+        "email": "test@example.com",
+        "name": "Test User"
+      }
+    }
+  }
+}

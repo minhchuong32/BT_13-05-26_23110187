@@ -1,0 +1,31 @@
+{
+  "message": "Get all categories",
+  "method": "GET",
+  "url": "http://localhost:8888/v1/api/categories",
+  "header": {},
+  "body": {},
+  "expected_result": {
+    "status": 200,
+    "body": {
+      "EC": 0,
+      "EM": "Thành công",
+      "data": [
+        {
+          "id": 3,
+          "name": "Casual",
+          "createdAt": "2026-05-14T02:44:49.000Z"
+        },
+        {
+          "id": 2,
+          "name": "Running",
+          "createdAt": "2026-05-14T02:44:49.000Z"
+        },
+        {
+          "id": 1,
+          "name": "Sneakers",
+          "createdAt": "2026-05-14T02:44:49.000Z"
+        }
+      ]
+    }
+  }
+}

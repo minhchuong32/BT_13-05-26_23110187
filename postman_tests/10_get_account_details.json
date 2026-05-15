@@ -1,0 +1,17 @@
+{
+  "message": "Get account details (Requires Auth)",
+  "method": "GET",
+  "url": "http://localhost:8888/v1/api/account",
+  "header": {
+    "Authorization": "Bearer your_access_token_here"
+  },
+  "body": {},
+  "expected_result": {
+    "status": 200,
+    "body": {
+      "email": "23110187@student.hcmute.edu.vn",
+      "name": "c",
+      "createdBy": "hoidanit"
+    }
+  }
+}

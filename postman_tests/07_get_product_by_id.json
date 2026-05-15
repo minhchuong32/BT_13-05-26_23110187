@@ -1,0 +1,45 @@
+{
+  "message": "Get product by ID",
+  "method": "GET",
+  "url": "http://localhost:8888/v1/api/products/123",
+  "header": {},
+  "body": {},
+  "expected_result": {
+    "EC": 0,
+    "EM": "Thành công",
+    "data": {
+      "product": {
+        "id": 1,
+        "name": "Nike Air Max 270",
+        "description": "Giày thể thao êm ái với đệm khí độc quyền.",
+        "price": "120.00",
+        "originalPrice": "150.00",
+        "stock": 50,
+        "sold": 120,
+        "categoryId": 1,
+        "images": [
+          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
+          "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=800&q=80"
+        ],
+        "createdAt": "2026-05-14T02:44:49.000Z",
+        "categoryName": "Sneakers"
+      },
+      "similar": [
+        {
+          "id": 5,
+          "name": "New Balance 574",
+          "description": "Thoải mái mọi lúc mọi nơi, thiết kế retro tinh tế.",
+          "price": "90.00",
+          "originalPrice": "100.00",
+          "stock": 15,
+          "sold": 5,
+          "categoryId": 1,
+          "images": [
+            "https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&q=80"
+          ],
+          "createdAt": "2026-05-14T02:44:49.000Z"
+        }
+      ]
+    }
+  }
+}

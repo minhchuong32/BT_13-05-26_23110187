@@ -1,0 +1,44 @@
+{
+  "message": "Get user details (Requires Auth)",
+  "method": "GET",
+  "url": "http://localhost:8888/v1/api/user",
+  "header": {
+    "Authorization": "Bearer your_access_token_here"
+  },
+  "body": {},
+  "expected_result": {
+    "status": 200,
+    "body": [
+      {
+        "_id": 5,
+        "name": "Test User",
+        "email": "test@example.com",
+        "role": "User"
+      },
+      {
+        "_id": 4,
+        "name": "c",
+        "email": "23110187@student.hcmute.edu.vn",
+        "role": "User"
+      },
+      {
+        "_id": 3,
+        "name": "123",
+        "email": "chuong@gmail.com",
+        "role": "User"
+      },
+      {
+        "_id": 2,
+        "name": "chu",
+        "email": "ch@gmail.com",
+        "role": "User"
+      },
+      {
+        "_id": 1,
+        "name": "chu",
+        "email": "chuongminh3225@gmail.com",
+        "role": "User"
+      }
+    ]
+  }
+}

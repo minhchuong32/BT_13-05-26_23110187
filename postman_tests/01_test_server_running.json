@@ -1,0 +1,11 @@
+{
+  "message": "Test server running / Root API",
+  "method": "GET",
+  "url": "http://localhost:8888/v1/api/",
+  "header": {},
+  "body": {},
+  "expected_result": {
+    "status": 200,
+    "body": "Hello world api - 23110187 [test token after login]"
+  }
+}
