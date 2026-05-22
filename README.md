@@ -1,72 +1,167 @@
-# Tài Liệu Giải Thích Luồng Hoạt Động Của Hệ Thống
+# Tài Liệu Mô Tả Logic Dự Án
 
-Dự án này là một ứng dụng Full-Stack (ReactJS Frontend + ExpressJS Backend) bao gồm các chức năng cốt lõi của một hệ thống thương mại điện tử cơ bản và quản lý xác thực người dùng.
+Đây là một ứng dụng Full-Stack gồm ReactJS ở frontend và ExpressJS + MySQL ở backend. Mục tiêu của dự án là mô phỏng một website bán hàng có xác thực người dùng, khôi phục mật khẩu bằng OTP và duyệt sản phẩm theo danh mục, bộ lọc, trang chi tiết.
 
-Dưới đây là giải thích chi tiết về luồng hoạt động logic của các chức năng chính trong hệ thống.
+## 1. Kiến Trúc Tổng Quan
 
-## 1. Luồng Xác thực và Quản lý Người dùng (Authentication)
+Hệ thống được chia thành 2 phần:
 
-### 1.1. Đăng ký tài khoản (Register)
-*   **Frontend (`/register`):** Người dùng nhập thông tin đăng ký (Tên, Email, Mật khẩu) trên giao diện. Frontend gửi một yêu cầu `POST /register` kèm theo dữ liệu người dùng đến Backend.
-*   **Backend (`userController.createUser`):** 
-    *   Tiếp nhận yêu cầu, kiểm tra dữ liệu đầu vào.
-    *   Mã hóa (hash) mật khẩu bằng thư viện `bcrypt` để đảm bảo bảo mật.
-    *   Lưu thông tin người dùng mới vào cơ sở dữ liệu.
-    *   Trả về phản hồi thành công cho Frontend.
+- Frontend: xử lý giao diện, điều hướng trang, gọi API và lưu trạng thái đăng nhập.
+- Backend: cung cấp API, xác thực token, truy vấn dữ liệu từ MySQL và xử lý nghiệp vụ.
 
-### 1.2. Đăng nhập (Login)
-*   **Frontend (`/login`):** Người dùng nhập Email và Mật khẩu. Frontend gửi yêu cầu `POST /login` đến Backend.
-*   **Backend (`userController.handleLogin`):**
-    *   Tìm kiếm người dùng theo Email trong Database.
-    *   Sử dụng `bcrypt` để so sánh mật khẩu người dùng nhập vào với mật khẩu đã mã hóa lưu trong Database.
-    *   Nếu khớp, Backend sẽ tạo ra một chuỗi token (Access Token) bằng `jsonwebtoken` chứa thông tin định danh của người dùng.
-    *   Trả token này về cho Frontend.
-*   **Frontend:** Nhận token và lưu trữ (thường là trong Local Storage hoặc Cookies) để đính kèm vào các yêu cầu cần xác thực sau này.
+Luồng dữ liệu đi theo hướng:
 
-### 1.3. Lấy thông tin tài khoản (Protected Routes)
-*   **Frontend:** Khi cần lấy thông tin người dùng (ví dụ trang Profile - `/user` hoặc `/account`), Frontend gửi yêu cầu `GET` kèm theo Access Token trong Header (thường là `Authorization: Bearer <token>`).
-*   **Backend (`auth middleware`):** 
-    *   Middleware `auth` sẽ chặn yêu cầu để kiểm tra tính hợp lệ của token trước khi cho phép đi tiếp vào Controller.
-    *   Sử dụng `jsonwebtoken` để giải mã và xác minh token. Nếu token hợp lệ và chưa hết hạn, middleware sẽ cho phép yêu cầu đi tiếp.
-*   **Backend (`userController.getUser` / `getAccount`):** Sau khi đi qua middleware thành công, trả về thông tin chi tiết của người dùng đang đăng nhập.
+1. Người dùng thao tác trên React.
+2. Frontend gọi các API trong `ExpressJS01_Backend`.
+3. Backend xử lý logic ở controller/service.
+4. Dữ liệu trả về cho frontend để render lại giao diện.
 
-## 2. Luồng Khôi phục Mật khẩu (Password Recovery)
+## 2. Luồng Xác Thực Người Dùng
 
-### 2.1. Quên mật khẩu - Gửi mã OTP
-*   **Frontend (`/forgot-password`):** Người dùng nhập Email tài khoản đã quên mật khẩu. Gửi yêu cầu `POST /forgot-password`.
-*   **Backend (`userController.forgotPassword`):**
-    *   Kiểm tra Email có tồn tại trong hệ thống không.
-    *   Tạo ra một mã OTP ngẫu nhiên (hoặc một token reset).
-    *   Sử dụng thư viện gửi mail (ví dụ: `nodemailer`) để gửi mã OTP đến Email của người dùng.
-    *   Lưu trữ mã OTP tạm thời (vào DB hoặc cache) kèm theo thời gian hết hạn để xác minh sau này.
+### 2.1. Đăng ký tài khoản
 
-### 2.2. Đặt lại mật khẩu - Xác minh OTP
-*   **Frontend (`/reset-password`):** Người dùng nhập Email, mã OTP vừa nhận được, và Mật khẩu mới. Gửi yêu cầu `POST /reset-password`.
-*   **Backend (`userController.resetPassword`):**
-    *   Kiểm tra sự khớp nhau và tính hợp lệ của Email và mã OTP (OTP có đúng không, có bị hết hạn không).
-    *   Nếu OTP hợp lệ, tiến hành mã hóa (`bcrypt`) Mật khẩu mới.
-    *   Cập nhật mật khẩu mới cho người dùng trong Database.
-    *   Xóa bỏ mã OTP vừa sử dụng để tránh việc có thể tái sử dụng.
+Trang đăng ký nằm ở `ReactJS_Frontend/src/pages/register.jsx`.
 
-## 3. Luồng Quản lý Sản phẩm (E-commerce)
+- Người dùng nhập `name`, `email`, `password`.
+- Frontend gọi `POST /v1/api/register`.
+- Backend đi vào `createUser` trong `userController`, sau đó gọi `createUserService`.
+- Service kiểm tra email đã tồn tại chưa.
+- Nếu chưa có, mật khẩu được hash bằng `bcrypt` trước khi lưu vào bảng `users`.
+- Tài khoản mới được lưu với role mặc định là `User`.
 
-### 3.1. Hiển thị danh sách và trang chủ
-*   **Frontend (Trang chủ `home.jsx`):** Khi trang chủ được tải, Frontend sẽ gọi các API `GET /categories` và `GET /products` để lấy dữ liệu.
-*   **Backend (`productController.getCategories` & `getProducts`):** 
-    *   Truy vấn Database thông qua các Services (`productService`) để lấy danh sách các danh mục và tất cả sản phẩm (hoặc sản phẩm nổi bật).
-    *   Trả dữ liệu về dạng JSON cho Frontend hiển thị lên giao diện dưới dạng danh sách hoặc slider ảnh.
+Ý nghĩa logic của bước này là không lưu mật khẩu dạng thô và ngăn đăng ký trùng email.
 
-### 3.2. Tìm kiếm và Lọc sản phẩm
-*   **Frontend (Trang `search.jsx`):** Khi người dùng nhập từ khóa tìm kiếm hoặc chọn các bộ lọc (như danh mục, khoảng giá, sắp xếp theo giá...), Frontend sẽ gửi yêu cầu `GET /products` kèm theo các tham số (Query Parameters, ví dụ: `?search=giày&category=thể-thao&sort=price_asc`).
-*   **Backend (`productController.getProducts`):**
-    *   Đọc các tham số tìm kiếm/lọc từ yêu cầu (`req.query`).
-    *   Tạo các điều kiện lọc linh hoạt và truyền xuống `productService`.
-    *   Thực hiện truy vấn Database dựa trên các điều kiện này để lấy ra danh sách sản phẩm chính xác khớp với tiêu chí của người dùng.
-    *   Trả kết quả tìm kiếm về cho Frontend để cập nhật lại danh sách.
+### 2.2. Đăng nhập
 
-### 3.3. Xem chi tiết sản phẩm
-*   **Frontend (`product-detail.jsx`):** Khi người dùng nhấp vào xem một sản phẩm, Frontend lấy ID của sản phẩm đó và gửi yêu cầu `GET /products/:id`.
-*   **Backend (`productController.getProductById`):**
-    *   Lấy tham số ID từ URL (`req.params.id`).
-    *   Truy vấn Database để lấy toàn bộ thông tin chi tiết của sản phẩm có ID tương ứng.
-    *   Nếu không tìm thấy, trả về lỗi 404. Nếu tìm thấy, trả về dữ liệu (tên, giá, mô tả, hình ảnh...) để Frontend dựng lại giao diện chi tiết sản phẩm (hiển thị mô tả, slider hình ảnh chi tiết bằng Swiper,...).
+Trang đăng nhập nằm ở `ReactJS_Frontend/src/pages/login.jsx`.
+
+- Người dùng nhập `email` và `password`.
+- Frontend gọi `POST /v1/api/login`.
+- Backend tìm user theo email, sau đó so sánh mật khẩu bằng `bcrypt.compare`.
+- Nếu hợp lệ, backend tạo JWT bằng `jsonwebtoken`.
+- Token trả về frontend cùng thông tin `email` và `name` của người dùng.
+- Frontend lưu `access_token` vào `localStorage` và cập nhật `AuthContext`.
+
+Từ thời điểm này, các request về sau sẽ tự gắn header `Authorization: Bearer <token>` nhờ interceptor trong `ReactJS_Frontend/src/util/axios.customize.js`.
+
+### 2.3. Tải lại trạng thái đăng nhập
+
+Khi ứng dụng mở lại, `ReactJS_Frontend/src/App.jsx` gọi `GET /v1/api/account` để kiểm tra người dùng còn hợp lệ hay không.
+
+- Nếu token còn hiệu lực, backend trả lại thông tin `req.user`.
+- Frontend dùng dữ liệu này để xem người dùng đã đăng nhập hay chưa.
+
+Điểm này giúp giữ trạng thái đăng nhập sau khi reload trang.
+
+### 2.4. Bảo vệ route bằng middleware
+
+Backend dùng middleware `auth` trong `ExpressJS01_Backend/src/middleware/auth.js`.
+
+- Một số route được cho phép truy cập công khai như `/register`, `/login`, `/forgot-password`, `/reset-password`, `/products`, `/categories` và `/products/:id`.
+- Các route còn lại bắt buộc phải có token hợp lệ.
+- Nếu token hợp lệ, middleware giải mã JWT và gắn thông tin vào `req.user`.
+- Nếu token sai hoặc hết hạn, API trả lỗi `401`.
+
+Logic này giúp phân tách rõ route công khai và route cần xác thực.
+
+## 3. Luồng Khôi Phục Mật Khẩu
+
+### 3.1. Gửi OTP khi quên mật khẩu
+
+Trang quên mật khẩu nằm ở `ReactJS_Frontend/src/pages/forgot-password.jsx`.
+
+- Người dùng nhập email đã đăng ký.
+- Frontend gọi `POST /v1/api/forgot-password`.
+- Backend kiểm tra email có tồn tại trong bảng `users` hay không.
+- Nếu tồn tại, backend tạo OTP 6 chữ số và sinh thêm `resetToken` chứa `email`, `otp`, `purpose`.
+- OTP được gửi qua email bằng `nodemailer`.
+- Backend trả về `resetToken`; frontend lưu token này vào `localStorage` để dùng cho bước reset.
+
+Nếu không có cấu hình mail thật, backend tự tạo test account để vẫn có thể kiểm tra luồng gửi mail.
+
+### 3.2. Đặt lại mật khẩu
+
+Trang đặt lại mật khẩu nằm ở `ReactJS_Frontend/src/pages/reset-password.jsx`.
+
+- Người dùng nhập `email`, `otp`, `newPassword`.
+- Frontend lấy `resetToken` đã lưu trước đó trong `localStorage`.
+- Frontend gọi `POST /v1/api/reset-password`.
+- Backend giải mã token, kiểm tra `purpose`, kiểm tra email và OTP có khớp hay không.
+- Nếu hợp lệ, mật khẩu mới được hash bằng `bcrypt` rồi cập nhật vào database.
+- Sau khi đổi xong, frontend xóa `resetToken` và `resetEmail`, rồi điều hướng về trang đăng nhập.
+
+Luồng này đảm bảo chỉ người có email nhận OTP mới đổi được mật khẩu.
+
+## 4. Luồng Sản Phẩm
+
+### 4.1. Trang chủ
+
+Trang chủ nằm ở `ReactJS_Frontend/src/pages/home.jsx`.
+
+- Khi trang mở, frontend gọi 3 request song song:
+  - `GET /v1/api/products?type=newest`
+  - `GET /v1/api/products?type=bestseller`
+  - `GET /v1/api/products?type=promotion`
+- Dữ liệu trả về được chia thành 3 khối hiển thị: sản phẩm mới, bán chạy và khuyến mãi.
+
+Backend dùng `getProductsService` để build câu SQL động theo query parameters.
+
+### 4.2. Tìm kiếm và lọc sản phẩm
+
+Trang tìm kiếm nằm ở `ReactJS_Frontend/src/pages/search.jsx`.
+
+Frontend có thể gửi các tham số sau:
+
+- `search` hoặc `q`: từ khóa tên sản phẩm.
+- `category`: lọc theo danh mục.
+- `minPrice`, `maxPrice`: lọc theo khoảng giá.
+- `sort`: sắp xếp giá tăng hoặc giảm.
+- `type`: lọc theo `promotion` hoặc `bestseller`.
+
+Backend đọc các query này trong `getProductsService`, ghép điều kiện vào SQL và trả danh sách phù hợp.
+
+Logic này giúp trang search vừa linh hoạt vừa tái sử dụng cùng một endpoint cho nhiều kiểu lọc khác nhau.
+
+### 4.3. Xem chi tiết sản phẩm
+
+Trang chi tiết nằm ở `ReactJS_Frontend/src/pages/product-detail.jsx`.
+
+- Khi người dùng bấm vào một sản phẩm, frontend gọi `GET /v1/api/products/:id`.
+- Backend lấy dữ liệu sản phẩm theo ID.
+- Ngoài thông tin chính, backend còn lấy thêm 4 sản phẩm cùng danh mục để hiển thị phần “sản phẩm tương tự”.
+- Frontend dùng Swiper để render thư viện ảnh và hiển thị mô tả, giá, tồn kho, số lượng đã bán.
+
+### 4.4. Danh mục sản phẩm
+
+Frontend gọi `GET /v1/api/categories` để lấy danh sách danh mục.
+
+- Danh mục được dùng cho bộ lọc ở trang search.
+- Dữ liệu này cũng giúp người dùng chuyển nhanh từ sản phẩm sang nhóm sản phẩm liên quan.
+
+## 5. Luồng Lấy Thông Tin Người Dùng
+
+Trang `ReactJS_Frontend/src/pages/user.jsx` gọi `GET /v1/api/user`.
+
+- API này yêu cầu token hợp lệ.
+- Nếu hợp lệ, backend trả danh sách user từ bảng `users`.
+- Frontend hiển thị dữ liệu dạng bảng.
+
+Đây là ví dụ cho nhóm route chỉ hoạt động khi đã đăng nhập.
+
+## 6. Tóm Tắt API Chính
+
+- `POST /v1/api/register`: tạo tài khoản mới.
+- `POST /v1/api/login`: đăng nhập và nhận JWT.
+- `GET /v1/api/account`: kiểm tra tài khoản đang đăng nhập.
+- `GET /v1/api/user`: lấy danh sách user.
+- `POST /v1/api/forgot-password`: tạo OTP và gửi mail.
+- `POST /v1/api/reset-password`: xác minh OTP và đổi mật khẩu.
+- `GET /v1/api/products`: lấy danh sách sản phẩm, hỗ trợ tìm kiếm và lọc.
+- `GET /v1/api/products/:id`: lấy chi tiết sản phẩm.
+- `GET /v1/api/categories`: lấy danh sách danh mục.
+
+## 7. Kết Luận
+
+Dự án tập trung vào 3 luồng chính: xác thực người dùng, khôi phục mật khẩu và duyệt sản phẩm. Backend xử lý nghiệp vụ bằng controller/service rõ ràng, còn frontend giữ vai trò điều hướng, gọi API và render giao diện theo dữ liệu trả về.
+
+Nếu cần, có thể bổ sung tiếp phần cài đặt, cách chạy dự án, hoặc sơ đồ luồng request để README đầy đủ hơn.
